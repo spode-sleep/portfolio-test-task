@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "api/contact.ts": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/api/contact", "destination": "/api/contact" },
+    { "source": "/(.*)", "destination": "/public/$1" }
+  ]
+}

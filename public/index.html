@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gleb Kosyrev — Full-Stack Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- Noise overlay -->
+  <div class="noise"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav__logo">GK<span class="blink">_</span></div>
+    <ul class="nav__links">
+      <li><a href="#about">about</a></li>
+      <li><a href="#approach">approach</a></li>
+      <li><a href="#experience">experience</a></li>
+      <li><a href="#projects">projects</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero" id="about">
+    <div class="hero__grid">
+      <img src="/img/photo.jpg" alt="Gleb Kosyrev" class="hero__photo" />
+      <h1 class="hero__name">
+        <span class="hero__first">Kosyrev</span>
+        <span class="hero__last">Gleb</span>
+      </h1>
+      <p class="hero__sub">
+        Full-stack developer from Moscow. 
+      </p>
+      <div class="hero__links">
+        <a href="https://github.com/spode-sleep" class="hero__link" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          github.com/spode-sleep
+        </a>
+        <a href="mailto:kosyrevgleb11@gmail.com" class="hero__link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          kosyrevgleb11@gmail.com
+        </a>
+        <a href="https://t.me/glebhere11" class="hero__link" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          @glebhere11
+        </a>
+      </div>
+    </div>
+    <div>
+      <div class="hero__stack">
+        <div class="stack-column">
+          <div class="stack-label">frontend</div>
+          <div class="stack-items">
+            <span>TypeScript</span><span>React</span><span>Vue 3</span>
+            <span>HTML</span><span>CSS</span><span>jQuery</span>
+          </div>
+        </div>
+        <div class="stack-column">
+          <div class="stack-label">backend</div>
+          <div class="stack-items">
+            <span>Node.js</span><span>Express</span><span>Nest.js</span>
+            <span>Python</span><span>FastAPI</span><span>REST API</span>
+            <span>WebSocket</span><span>PHP</span>
+          </div>
+        </div>
+        <div class="stack-column">
+          <div class="stack-label">data & infra</div>
+          <div class="stack-items">
+            <span>MongoDB</span><span>MySQL</span><span>Redis</span>
+            <span>Prisma ORM</span><span>Docker</span><span>Git</span>
+            <span>Linux</span><span>Ollama</span><span>ChromaDB</span>
+          </div>
+        </div>
+        <div class="stack-column">
+          <div class="stack-label">AI & Machine Learning</div>
+          <div class="stack-items">
+            <span>OpenAI API</span><span>RAG</span><span>PyTorch</span>
+            <span>LLM Integration</span><span>Prompt Engineering</span><span>ChromaDB</span>
+          </div>
+        </div>
+        <div class="stack-column">
+          <div class="stack-label">languages</div>
+          <div class="stack-items lang">
+            <span>🇷🇺 Russian — native</span>
+            <span>🇬🇧 English — B2 (TOEIC 890)</span>
+            <span>🇯🇵 日本語 — B1/N3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Approach -->
+  <section class="section approach" id="approach">
+    <div class="section__inner">
+      <h2 class="section__title">
+        How I work
+      </h2>
+      <div class="approach__grid">
+        <div class="approach__card">
+          <h3>Deep problem understanding</h3>
+          <p>I clarify business goals, map data flows, and choose a minimal tech stack that solves the problem without bloat.</p>
+        </div>
+        <div class="approach__card">
+          <h3>AI as tool, not replacement</h3>
+          <p>I use GitHub Copilot, ChatGPT, and Claude to accelerate routine work. I review and understand generated code. Experience integrating CustomGPT with knowledge bases via OpenAI API in production. <span class="open_ai_api_notice">This page also features integration with the OpenAI API. Please try submitting a message via the contact form.</span></p>
+        </div>
+        <div class="approach__card">
+          <h3>Multilingual communication</h3>
+          <p>3 years at a Japanese company: tasks in Japanese, docs in English, code reviews across cultures. I explain complex things simply in three languages.</p>
+        </div>
+        <div class="approach__card">
+          <h3>End-to-end ownership</h3>
+          <p>I cover the full stack: from database design to responsive UI. Shipped systems scaling from zero to 200–2000 active users.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section class="section experience" id="experience">
+    <div class="section__inner">
+      <h2 class="section__title">
+        Experience
+      </h2>
+
+      <div class="experience__subsection">
+        <h3 class="subsection-title">commercial experience</h3>
+        
+        <article class="job">
+          <div class="job__header">
+            <div>
+              <h4 class="job__title">Software Engineer (Full-Stack Developer)</h4>
+              <p class="job__company">HunterSite (ハンターサイト株式会社)</p>
+            </div>
+            <span class="job__period">March 2023 — March 2026</span>
+          </div>
+          <p class="job__desc">
+            Full-stack developer at a Japanese IT company. Developed frontend and backend for payment systems and time tracking apps. Worked cross-functionally in Japanese and English. Delivered production systems serving real users, balancing performance with maintainability.
+          </p>
+          <div class="job__stack">
+            <span>TypeScript</span><span>React</span><span>Vue 3</span>
+            <span>Node.js</span><span>MongoDB</span><span>MySQL</span>
+            <span>Prisma ORM</span><span>Docker</span><span>WordPress</span>
+            <span>OpenAI API</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="experience__subsection">
+        <h3 class="subsection-title">competitive programming</h3>
+        
+        <div class="competitive">
+          <div class="competitive__icon">◈</div>
+          <div>
+            <div class="competitive__label">CodeAbbey</div>
+            <div class="competitive__rank">277th place (Top 0.4%) · Primary language: C</div>
+            <p class="competitive__desc">Demonstrates strong algorithmic thinking and problem-solving skills.</p>
+          </div>
+          <a href="https://www.codeabbey.com/index/user_profile/glebkosyrev" class="competitive__link" target="_blank" rel="noopener">profile ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="section projects" id="projects">
+    <div class="section__inner">
+      <h2 class="section__title">
+        Projects
+      </h2>
+
+      <div class="projects__subsection">
+        <h3 class="subsection-title">commercial projects</h3>
+        <div class="cases__grid">
+          <article class="case">
+            <div class="case__header">
+              <span class="case__period">Jan 2024 — Oct 2024</span>
+              <h3 class="case__title">E-commerce trading platform</h3>
+            </div>
+            <p class="case__desc">Three-tier platform converting in-game points to real currency with operator verification. ~200 daily users.</p>
+            <ul class="case__points">
+              <li>Multi-step transfer verification with audit logging</li>
+              <li>Coupon system for point sales and account top-ups</li>
+              <li>Responsive UI for client and operator interfaces</li>
+            </ul>
+            <div class="case__stack">
+              <span>TypeScript</span><span>React</span><span>Node.js</span>
+              <span>MySQL</span><span>Prisma ORM</span><span>Axios</span>
+            </div>
+          </article>
+
+          <article class="case">
+            <div class="case__header">
+              <span class="case__period">Oct 2024 — Mar 2026</span>
+              <h3 class="case__title">Corporate attendance system</h3>
+            </div>
+            <p class="case__desc">Workplace monitoring system with role-based access. ~2000 active users in first year.</p>
+            <ul class="case__points">
+              <li>Scalable MongoDB schema with org hierarchy and profiles</li>
+              <li>QR-code clock-in/out with real-time WebSocket updates</li>
+              <li>Granular role-based access control with permissions</li>
+              <li>Virtual scrolling for tables with thousands of rows</li>
+            </ul>
+            <div class="case__stack">
+              <span>TypeScript</span><span>Vue 3</span><span>Node.js</span>
+              <span>MongoDB</span><span>Redis</span><span>WebSocket</span>
+            </div>
+          </article>
+
+          <article class="case">
+            <div class="case__header">
+              <span class="case__period">2023–2026</span>
+              <h3 class="case__title">AI integrations & WordPress</h3>
+            </div>
+            <p class="case__desc">Custom GPT with RAG knowledge base via OpenAI API. Multiple WordPress sites with custom solutions.</p>
+            <ul class="case__points">
+              <li>Prompt design guides for production GPTs</li>
+              <li>OpenAI API integration into existing products</li>
+              <li>Custom WordPress solutions per client needs</li>
+            </ul>
+            <div class="case__stack">
+              <span>OpenAI API</span><span>RAG</span><span>WordPress</span><span>PHP</span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="projects__subsection">
+        <h3 class="subsection-title">personal projects</h3>
+        <div class="cases__grid">
+          <article class="case">
+            <div class="case__header">
+              <span class="case__period">Jan 2026 — now</span>
+              <h3 class="case__title">BOX — offline knowledge hub</h3>
+              <a href="https://github.com/spode-sleep/noa" class="case__github" target="_blank" rel="noopener">github ↗</a>
+            </div>
+            <p class="case__desc">Offline SPA: media library, knowledge base, local AI agent with tool-calling, and RAG over ZIM archives.</p>
+            <ul class="case__points">
+              <li>Multi-page Vue 3 interface with modular architecture</li>
+              <li>Local AI agent with tool-calling and autonomous codebase exploration</li>
+              <li>RAG pipeline with ZIM text extraction and ChromaDB search</li>
+              <li>Ollama, Piper TTS, and Git integration for full autonomy</li>
+            </ul>
+            <div class="case__stack">
+              <span>Vue 3</span><span>TypeScript</span><span>Node.js</span>
+              <span>Ollama</span><span>ChromaDB</span><span>Piper TTS</span>
+            </div>
+          </article>
+
+          <article class="case">
+            <div class="case__header">
+              <span class="case__period">2020</span>
+              <h3 class="case__title">Recommender system (VAE)</h3>
+              <a href="https://github.com/spode-sleep/VAERecommender" class="case__github" target="_blank" rel="noopener">github ↗</a>
+            </div>
+            <p class="case__desc">Hybrid recommender for visual novels. 200k users, 50k works. Flask REST API with caching.</p>
+            <ul class="case__points">
+              <li>Flask REST API with auth and recommendation endpoints</li>
+              <li>ML model integration with web backend</li>
+              <li>Caching layer for response optimization</li>
+            </ul>
+            <div class="case__stack">
+              <span>Python</span><span>PyTorch</span><span>Flask</span><span>NumPy</span>
+            </div>
+          </article>
+
+          <article class="case">
+            <div class="case__header">
+              <span class="case__period">2019</span>
+              <h3 class="case__title">Collaborative drawing web app</h3>
+              <a href="https://github.com/spode-sleep/utgard" class="case__github" target="_blank" rel="noopener">github ↗</a>
+            </div>
+            <p class="case__desc">Platform for collaborative illustration with moderation, tags, ratings, and full auth.</p>
+            <ul class="case__points">
+              <li>Complete user auth and registration system</li>
+              <li>Advanced search with filtering and sorting</li>
+              <li>Rating and commenting systems</li>
+              <li>Admin panel for content moderation</li>
+            </ul>
+            <div class="case__stack">
+              <span>PHP</span><span>JavaScript</span><span>jQuery</span><span>MySQL</span>
+            </div>
+          </article>
+
+          <article class="case">
+            <div class="case__header">
+              <span class="case__period">2018</span>
+              <h3 class="case__title">Interactive 3D scene (OpenGL)</h3>
+              <a href="https://github.com/spode-sleep/Nevereverland" class="case__github" target="_blank" rel="noopener">github ↗</a>
+            </div>
+            <p class="case__desc">Interactive 3D bar scene with multiple elements showcasing computer graphics programming.</p>
+            <ul class="case__points">
+              <li>3D geometry and texturing with OpenGL</li>
+              <li>Built-in music player with synchronized animations</li>
+              <li>Custom scripting language for visual novel text</li>
+              <li>Interactive drink-mixing mini-game with physics</li>
+            </ul>
+            <div class="case__stack">
+              <span>OpenGL</span><span>C</span><span>3D Graphics</span>
+            </div>
+          </article>
+
+          <article class="case">
+            <div class="case__header">
+              <span class="case__period">2019</span>
+              <h3 class="case__title">Music bot for Discord</h3>
+              <a href="https://github.com/spode-sleep/Tsubasa_Radio" class="case__github" target="_blank" rel="noopener">github ↗</a>
+            </div>
+            <p class="case__desc">Discord bot for voice channel music playback with text commands.</p>
+            <ul class="case__points">
+              <li>User interaction logic with command parsing</li>
+              <li>Music streaming and queue management</li>
+              <li>Integration with multiple music sources and APIs</li>
+              <li>Async event handling and error recovery</li>
+            </ul>
+            <div class="case__stack">
+              <span>Discord API</span><span>Python</span><span>Async</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section contact" id="contact">
+    <div class="section__inner">
+      <h2 class="section__title">
+        Get in touch
+      </h2>
+      <div class="contact__layout">
+        <div class="contact__info">
+          <p>Open to new projects and work opportunities. I'll respond within 24 hours.</p>
+        </div>
+
+        <form class="form" id="contactForm" novalidate>
+          <div class="form__row">
+            <div class="form__field">
+              <label class="form__label" for="name">name *</label>
+              <input class="form__input" type="text" id="name" name="name" placeholder="John Doe" required />
+              <span class="form__error" id="nameError"></span>
+            </div>
+            <div class="form__field">
+              <label class="form__label" for="phone">phone *</label>
+              <input class="form__input" type="tel" id="phone" name="phone" placeholder="+1 234 567-8900" required />
+              <span class="form__error" id="phoneError"></span>
+            </div>
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="email">email *</label>
+            <input class="form__input" type="email" id="email" name="email" placeholder="your@email.com" required />
+            <span class="form__error" id="emailError"></span>
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="comment">message *</label>
+            <textarea class="form__input form__textarea" id="comment" name="comment" placeholder="Tell me about your project..." required rows="5"></textarea>
+            <span class="form__error" id="commentError"></span>
+          </div>
+          <button class="form__submit" type="submit" id="submitBtn">
+            <span class="btn-text">send</span>
+            <span class="btn-loading" hidden>
+              <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+              sending...
+            </span>
+          </button>
+          <div class="form__success" id="formSuccess" hidden>
+            <div class="success__icon" id="successIcon" hidden>✓</div>
+            <p class="success__message" id="successMessage"></p>
+          </div>
+          <div class="form__error-global" id="formError" hidden></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <span>Gleb Kosyrev</span>
+      <span class="footer__sep">·</span>
+      <span>Full-Stack Developer</span>
+      <span class="footer__sep">·</span>
+      <span>Moscow, Russia</span>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
