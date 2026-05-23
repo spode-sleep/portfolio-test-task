@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gleb Kosyrev - 3D Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    @font-face {
+      font-family: 'AskewFont';
+      src: url('./css/fonts/AskewFont.woff2') format('woff2'),
+          url('./css/fonts/AskewFont.woff') format('woff'),
+          url('./css/fonts/AskewFont.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+    :root {
+      --bg: #000e14; --bg-1: #0b0c32; --bg-2: #001219;
+      --border: #005264; --border-light: #003a4a;
+      --text: #f5d4a0; --text-dim: #82cab1; --text-dimmer: #3a7a6a;
+      --accent: #00aaaa; --accent-alt: #00ecff; --accent-dim: rgba(0,170,170,0.10);
+      --gold: #ecb16e; --gold-light: #f5d4a0; --red: #d22323;
+      --btn-bg: #1b8285; --btn-hover: #82cab1;
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      --font-display: 'AskewFont', 'Segoe UI', Tahoma, Geneva, Verdana, Arial, sans-serif;
+    }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+    canvas { display: block; }
+
+    #hud {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+      height: 48px; display: flex; align-items: center; gap: 24px; padding: 0 28px;
+      background: rgba(11,12,50,0.85); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono); pointer-events: none;
+    }
+    #hud-logo { font-size: 18px; color: var(--accent); letter-spacing: 0.06em; font-family: var(--font-display); }
+    #hud-blink { animation: blink 1.1s step-end infinite; font-family: var(--font-display);}
+    #hud-hint { font-size: 10px; color: var(--text-dimmer); letter-spacing: 0.1em; margin-left: auto; font-family: var(--font-display);}
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    #crosshair {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none; z-index: 5;
+    }
+    #crosshair span {
+      display: block; width: 16px; height: 16px;
+      border: 1px solid rgba(0,170,170,0.5); border-radius: 50%; position: relative;
+    }
+    #crosshair span::before { content:''; position:absolute; width:1px; height:8px; background:rgba(0,170,170,0.5); top:50%; left:50%; transform:translate(-50%,-50%); }
+    #crosshair span::after  { content:''; position:absolute; height:1px; width:8px; background:rgba(0,170,170,0.5); top:50%; left:50%; transform:translate(-50%,-50%); }
+
+    #panel-overlay {
+      position: fixed; inset: 0; z-index: 20;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(0,10,20,0.7); backdrop-filter: blur(4px);
+    }
+    #panel-overlay.open { display: flex; }
+    #panel {
+      width: min(720px,92vw); max-height: 85vh; overflow-y: auto;
+      background: var(--bg-1); border: 1px solid #000;
+      border-top: 2px solid var(--border); border-left: 2px solid var(--border);
+      box-shadow: inset 1px 1px 0 #1b8285, inset -1px -1px 0 #000d12, 0 24px 80px rgba(0,170,170,0.15);
+      font-family: var(--font-mono); color: var(--text); animation: panelIn 0.18s ease;
+    }
+    @keyframes panelIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+    #panel-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 20px; border-bottom:1px solid var(--border);
+      position:sticky; top:0; background:var(--bg-1); z-index:2;
+    }
+    #panel-title { font-size:13px; color:var(--gold-light); letter-spacing:0.1em; text-transform:uppercase; font-family: var(--font-display);}
+    #panel-close { cursor:pointer; font-size:16px; color:var(--text-dimmer); background:none; border:none; font-family:var(--font-display); padding:2px 8px; transition:color 0.15s; }
+    #panel-close:hover { color:var(--gold); }
+    #panel-body { padding:24px 20px; }
+
+    .panel-section { margin-bottom:28px; }
+    .panel-section:last-child { margin-bottom:0; }
+    .panel-label { font-size:9px; color:var(--accent-alt); letter-spacing:0.14em; text-transform:uppercase; opacity:0.9; margin-bottom:10px; }
+    .panel-name { font-family:var(--font-display),sans-serif; font-size:28px; line-height:1; color:var(--gold-light); letter-spacing:0.02em; margin-bottom:6px; }
+    .panel-sub { font-size:12px; color:var(--text-dim); line-height:1.7; }
+    .tag-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
+    .tag { font-size:10px; padding:2px 8px; border:1px solid var(--border); color:var(--text-dim); background:var(--bg-2); letter-spacing:0.04em; }
+    .tag.gold { border-color:#5a3a10; color:var(--gold); background:rgba(236,177,110,0.07); }
+    .approach-card { padding:14px 16px; border-top:1px solid var(--border-light); }
+    .approach-card:first-child { border-top:none; }
+    .approach-card h3 { font-size:12px; color:var(--gold-light); margin-bottom:5px; }
+    .approach-card p { font-size:11px; color:var(--text-dim); line-height:1.7; }
+    .exp-block { padding:14px 0; }
+    .exp-header { display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+    .exp-title { font-size:13px; color:var(--gold-light); }
+    .exp-co { font-size:11px; color:var(--text-dim); }
+    .exp-period { font-size:10px; color:var(--gold); opacity:0.6; letter-spacing:0.08em; flex-shrink:0; }
+    .exp-desc { font-size:11px; color:var(--text-dim); line-height:1.65; margin-bottom:8px; }
+    .exp-stack { display:flex; flex-wrap:wrap; gap:4px; }
+    .exp-stack span, .proj-stack span { font-size:9px; padding:2px 6px; border:1px solid var(--border-light); color:var(--text-dimmer); background:var(--bg-2); }
+    .proj-item { padding:12px 0; }
+    .proj-header { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+    .proj-period { font-size:10px; color:var(--gold); opacity:0.6; }
+    .proj-title { font-size:12px; color:var(--gold-light); }
+    .proj-github { margin-left:auto; font-size:10px; color:var(--accent-alt); opacity:0.7; text-decoration:none; flex-shrink:0; }
+    .proj-github:hover { opacity:1; }
+    .proj-desc { font-size:11px; color:var(--text-dim); line-height:1.65; margin-bottom:6px; }
+    .proj-points { list-style:none; margin-bottom:8px; }
+    .proj-points li { font-size:10px; color:var(--text-dim); padding-left:14px; position:relative; line-height:1.6; }
+    .proj-points li::before { content:'-'; position:absolute; left:0; color:var(--accent); opacity:0.5; }
+    .proj-stack { display:flex; flex-wrap:wrap; gap:4px; }
+    .contact-layout { display:grid; grid-template-columns:1fr 1.6fr; gap:28px; align-items:start; }
+    .contact-info { font-size:12px; color:var(--text-dim); line-height:1.75; }
+    .contact-links { display:flex; flex-direction:column; gap:6px; margin-top:14px; }
+    .contact-links a { font-size:11px; color:var(--text-dim); text-decoration:none; display:flex; align-items:center; gap:6px; }
+    .contact-links a:hover { color:var(--accent-alt); }
+    .form { display:flex; flex-direction:column; gap:14px; }
+    .form__row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .form__field { display:flex; flex-direction:column; gap:4px; }
+    .form__label { font-size:9px; color:var(--text-dim); letter-spacing:0.12em; opacity:0.8; }
+    .form__input { font-family:var(--font-mono); font-size:12px; color:var(--text); background:var(--bg-2); border:1px solid var(--border); padding:8px 10px; outline:none; width:100%; transition:border-color 0.15s,box-shadow 0.15s; }
+    .form__input::placeholder { color:var(--text-dimmer); }
+    .form__input:focus { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent),0 0 12px rgba(0,170,170,0.15); }
+    .form__input.has-error { border-color:var(--red); }
+    .form__textarea { resize:vertical; min-height:90px; }
+    .form__error-msg { font-size:10px; color:var(--red); min-height:14px; }
+    .form__submit { font-family:var(--font-mono); font-size:11px; letter-spacing:0.1em; color:var(--bg); background:var(--btn-bg); border:1px solid #000; padding:10px 22px; cursor:pointer; align-self:flex-start; display:flex; align-items:center; gap:8px; transition:background 0.15s; box-shadow:inset 1px 1px 0 var(--btn-hover),inset -1px -1px 0 #000d12; }
+    .form__submit:hover:not(:disabled) { background:var(--btn-hover); }
+    .form__submit:disabled { opacity:0.45; cursor:not-allowed; }
+    .spinner { animation:spin 0.8s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+    .form__success { padding:12px 16px; border:1px solid var(--accent); background:var(--accent-dim); font-size:12px; color:var(--text); }
+    .form__success[hidden],.form__error-global[hidden] { display:none; }
+    .form__error-global { padding:10px 14px; border:1px solid var(--red); font-size:11px; color:var(--red); background:rgba(210,35,35,0.08); }
+    .section-divider {
+      display:flex; align-items:center; gap:12px;
+      margin:28px 0 18px; font-size:9px; color:var(--text-dimmer);
+      letter-spacing:0.18em; text-transform:uppercase;
+    }
+    .section-divider::before, .section-divider::after {
+      content:''; flex:1; height:1px; background:var(--border);
+    }
+    .section-divider.sub {
+      margin:20px 0 12px; color:var(--text-dimmer); opacity:0.6;
+      font-size:8px;
+    }
+    .section-divider.sub::before, .section-divider.sub::after {
+      background:var(--border-light);
+    }
+    @media(max-width:560px){.contact-layout{grid-template-columns:1fr}.form__row{grid-template-columns:1fr}}
+
+    #splash {
+      position:fixed; inset:0; z-index:100;
+      background:var(--bg); display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:20px;
+      font-family:var(--font-display); color:var(--text); transition:opacity 0.4s;
+    }
+    #splash h1 { font-family:var(--font-display),sans-serif; font-size:clamp(36px,6vw,64px); color:var(--gold-light); letter-spacing:0.02em; }
+    #splash-btn { margin-top:8px; font-family:var(--font-mono); font-size:12px; letter-spacing:0.1em; color:var(--bg); background:var(--btn-bg); border:1px solid #000; padding:12px 32px; cursor:pointer; box-shadow:inset 1px 1px 0 var(--btn-hover),inset -1px -1px 0 #000d12; transition:background 0.15s; }
+    #splash-btn:hover { background:var(--btn-hover); }
+    .splash-hint { font-size:10px; color:var(--text-dimmer); letter-spacing:0.08em; margin-top:4px; }
+
+    #lock-hint {
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+      font-family:var(--font-mono); font-size:10px; color:#f5a742;
+      letter-spacing:0.12em; z-index:10; pointer-events:none;
+      opacity:1; transition:opacity 0.6s;
+    }
+    #lock-hint.hidden { opacity:0; }
+    #interact-hint {
+      position:fixed; bottom:50px; left:50%; transform:translateX(-50%);
+      font-family:var(--font-mono); font-size:11px; color:#f5a742;
+      letter-spacing:0.08em; z-index:10; pointer-events:none;
+      opacity:0; transition:opacity 0.25s; white-space:nowrap;
+    }
+    #interact-hint.visible { opacity:1; }
+  </style>
+</head>
+<body>
+
+<div id="splash">
+  <p style="font-size:11px;color:var(--accent);letter-spacing:0.14em">PORTFOLIO</p>
+  <h1>Kosyrev<br><span style="color:var(--accent)">Gleb</span></h1>
+  <p>WASD to move &nbsp;·&nbsp; Mouse to look &nbsp;·&nbsp; Click cubes for info &nbsp;·&nbsp; ESC to release mouse</p>
+  <button id="splash-btn">[ enter ]</button>
+</div>
+
+<div id="hud">
+  <div id="hud-logo">GK<span id="hud-blink">_</span></div>
+  <div id="hud-hint">WASD - move &nbsp;·&nbsp; MOUSE - camera &nbsp;·&nbsp; CLICK CUBE - info &nbsp;·&nbsp; ESC - release mouse</div>
+</div>
+
+<div id="crosshair"><span></span></div>
+<div id="lock-hint">CLICK CANVAS TO CAPTURE MOUSE</div>
+<div id="interact-hint"></div>
+
+<div id="panel-overlay">
+  <div id="panel">
+    <div id="panel-header">
+      <span id="panel-title"></span>
+      <button id="panel-close" onclick="closePanel()">[ X ]</button>
+    </div>
+    <div id="panel-body"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// PANEL DATA
+// ─────────────────────────────────────────────
+const PANELS = {
+  about: { title:'[ about ]', html:`
+    <div class="panel-section"><div class="panel-label">identity</div><div class="panel-name">Kosyrev<br>Gleb</div><div class="panel-sub">Full-stack developer from Moscow.</div>
+    <div class="tag-row"><a href="https://github.com/spode-sleep" target="_blank" class="tag gold" style="text-decoration:none">github ↗</a><a href="mailto:kosyrevgleb11@gmail.com" class="tag gold" style="text-decoration:none">kosyrevgleb11@gmail.com</a><a href="https://t.me/glebhere11" target="_blank" class="tag gold" style="text-decoration:none">@glebhere11</a></div></div>
+    <div class="panel-section"><div class="panel-label">frontend</div><div class="tag-row"><span class="tag">TypeScript</span><span class="tag">React</span><span class="tag">Vue 3</span><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">jQuery</span></div></div>
+    <div class="panel-section"><div class="panel-label">backend</div><div class="tag-row"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">Nest.js</span><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">REST API</span><span class="tag">WebSocket</span><span class="tag">PHP</span></div></div>
+    <div class="panel-section"><div class="panel-label">data & infra</div><div class="tag-row"><span class="tag">MongoDB</span><span class="tag">MySQL</span><span class="tag">Redis</span><span class="tag">Prisma ORM</span><span class="tag">Docker</span><span class="tag">Git</span><span class="tag">Linux</span><span class="tag">Ollama</span><span class="tag">ChromaDB</span></div></div>
+    <div class="panel-section"><div class="panel-label">AI & ML</div><div class="tag-row"><span class="tag">OpenAI API</span><span class="tag">RAG</span><span class="tag">PyTorch</span><span class="tag">LLM Integration</span><span class="tag">Prompt Engineering</span></div></div>
+    <div class="panel-section"><div class="panel-label">languages</div><div class="panel-sub">🇷🇺 Russian - native<br>🇬🇧 English - B2 (TOEIC 890)<br>🇯🇵 日本語 - B1/N3</div></div>` },
+  approach: { title:'[ how I work ]', html:`
+    <div class="panel-section"><div class="panel-label">approach</div>
+    <div style="border:1px solid #000;border-top:2px solid var(--border);border-left:2px solid var(--border);box-shadow:inset 1px 1px 0 #1b8285,inset -1px -1px 0 #000d12;">
+      <div class="approach-card"><h3>Deep problem understanding</h3><p>I clarify business goals, map data flows, and choose a minimal tech stack that solves the problem without bloat.</p></div>
+      <div class="approach-card"><h3>AI as tool, not replacement</h3><p>I use GitHub Copilot, ChatGPT, and Claude to accelerate routine work. Experience integrating CustomGPT with knowledge bases via OpenAI API in production.</p></div>
+      <div class="approach-card"><h3>Multilingual communication</h3><p>3 years at a Japanese company: tasks in Japanese, docs in English, code reviews across cultures.</p></div>
+      <div class="approach-card"><h3>End-to-end developer</h3><p>I cover the full stack: from database design to responsive UI. Shipped systems scaling from zero to 200–2000 active users.</p></div>
+    </div></div>` },
+  experience: { title:'[ experience & projects ]', html:`
+    <div class="section-divider">work experience</div>
+    <div class="proj-item"><div class="proj-header"><span class="proj-period">March 2023 - March 2026</span><div><div class="exp-title">Full-Stack Engineer (HunterSite (ハンターサイト株式会社)</div></div></div>
+    <div class="exp-desc">Full-stack developer at a Japanese IT company. Payment systems, time tracking apps.</div>
+    <div class="exp-stack"><span>TypeScript</span><span>React</span><span>Vue 3</span><span>Node.js</span><span>MongoDB</span><span>MySQL</span><span>Prisma ORM</span><span>Docker</span><span>OpenAI API</span></div></div>
+
+    <div class="section-divider">competitive programming</div>
+    <div class="exp-block"><div class="exp-header"><div><div class="exp-title">◈ CodeAbbey</div></div></div>
+    <div class="exp-desc">277th place (Top 0.4%) · Primary language: C.</div></div>
+
+    <div class="section-divider">commercial projects</div>
+    <div class="proj-item"><div class="proj-header"><span class="proj-period">Jan 2024 - Oct 2024</span><span class="proj-title">E-commerce trading platform</span></div>
+    <div class="proj-desc">Three-tier platform converting in-game points to real currency, with operator verification workflows. ~200 daily users.</div>
+    <ul class="proj-points"><li>Transfer request flow with multi-step verification</li><li>Coupon system for game point sales and account top-ups</li><li>Responsive UI for client-facing and operator-facing interfaces</li></ul>
+    <div class="proj-stack"><span>TypeScript</span><span>React</span><span>Node.js</span><span>MySQL</span><span>Prisma ORM</span><span>Axios</span></div></div>
+    <div class="proj-item"><div class="proj-header"><span class="proj-period">Oct 2024 - Mar 2026</span><span class="proj-title">Corporate attendance system</span></div>
+    <div class="proj-desc">Enterprise-grade workplace monitoring with role-based access. ~2000 active users in the first year.</div>
+    <ul class="proj-points"><li>Scalable MongoDB schema for attendance records and org hierarchy</li><li>QR code clock-in/clock-out with dynamic code generation</li><li>Role-based access control with granular permissions</li><li>WebSocket live attendance status updates</li><li>Dynamic forms with validation and virtual scrolling for large datasets</li></ul>
+    <div class="proj-stack"><span>TypeScript</span><span>Vue 3</span><span>Node.js</span><span>MongoDB</span><span>Redis</span><span>WebSocket</span></div></div>
+
+    <div class="section-divider">personal projects</div>
+    <div class="proj-item"><div class="proj-header"><span class="proj-period">Jan 2026 - now</span><span class="proj-title">BOX - offline knowledge hub</span><a href="https://github.com/spode-sleep/noa" target="_blank" class="proj-github">github ↗</a></div>
+    <div class="proj-desc">Offline SPA combining media library, reference library, and a local AI agent with RAG - fully offline.</div>
+    <ul class="proj-points"><li>Game library with SteamDB/RAWG data, ProtonDB reports; music player with metadata; PDF/EPUB/FB2 viewer; ZIM browser (Wikipedia, iFixIt, WikiHow); git repo browser</li><li>Local GitHub Copilot alternative via Ollama with native tool-calling - reads, writes, edits files, runs builds, creates branches and commits autonomously</li><li>RAG pipeline: ZIM text extraction, section-aware chunking, embeddings via nomic-embed-text, ChromaDB similarity search, source-attributed prompt injection</li></ul>
+    <div class="proj-stack"><span>Vue 3</span><span>TypeScript</span><span>Node.js</span><span>Ollama</span><span>ChromaDB</span><span>Piper TTS</span></div></div>
+    <div class="proj-item"><div class="proj-header"><span class="proj-period">Feb 2020 - May 2020</span><span class="proj-title">Recommender system (VAE)</span><a href="https://github.com/spode-sleep/VAERecommender" target="_blank" class="proj-github">github ↗</a></div>
+    <div class="proj-desc">Hybrid recommender for visual novels with RESTful web service. ~200k users, ~50k works at last deployment.</div>
+    <ul class="proj-points"><li>Flask REST API with authentication and recommendation endpoints</li><li>ML model integration with caching layer for response times</li></ul>
+    <div class="proj-stack"><span>Python</span><span>PyTorch</span><span>Flask</span><span>NumPy</span></div></div>
+    <div class="proj-item"><div class="proj-header"><span class="proj-period">Oct 2019 - Dec 2019</span><span class="proj-title">Collaborative drawing platform</span><a href="https://github.com/spode-sleep/utgard" target="_blank" class="proj-github">github ↗</a></div>
+    <div class="proj-desc">Web app for collaborative illustration creation via incremental steps, with content moderation.</div>
+    <ul class="proj-points"><li>User auth, search with filtering/sorting, rating and commenting systems</li><li>Flexible tagging, image processing, admin moderation panel</li></ul>
+    <div class="proj-stack"><span>PHP</span><span>JavaScript</span><span>jQuery</span><span>MySQL</span></div></div>
+    <div class="proj-item"><div class="proj-header"><span class="proj-period">Nov 2019 - Dec 2019</span><span class="proj-title">Music bot for Discord</span><a href="https://github.com/spode-sleep/Tsubasa_Radio" target="_blank" class="proj-github">github ↗</a></div>
+    <div class="proj-desc">Discord bot for music playback in voice channels with queue management and multi-source streaming.</div>
+    <div class="proj-stack"><span>Python</span><span>Discord API</span></div></div>
+    <div class="proj-item"><div class="proj-header"><span class="proj-period">Oct 2018 - Dec 2018</span><span class="proj-title">Interactive 3D scene (OpenGL)</span><a href="https://github.com/spode-sleep/Nevereverland" target="_blank" class="proj-github">github ↗</a></div>
+    <div class="proj-desc">Interactive 3D bar scene with ~10 objects, music player, custom scripting language, and drink-mixing mini-game.</div>
+    <div class="proj-stack"><span>OpenGL</span><span>C</span></div></div>` },
+  contact: { title:'[ get in touch ]', html:`
+    <div class="panel-section"><div class="contact-layout">
+      <div class="contact-info"><p>Open to new projects and work opportunities. I'll respond within 24 hours.</p></div>
+      <form class="form" id="contactForm3D" novalidate>
+        <div class="form__row">
+          <div class="form__field"><label class="form__label" for="p3d-name">name *</label><input class="form__input" type="text" id="p3d-name" placeholder="John Doe" required/><span class="form__error-msg" id="p3d-nameErr"></span></div>
+          <div class="form__field"><label class="form__label" for="p3d-phone">phone *</label><input class="form__input" type="tel" id="p3d-phone" placeholder="+1 234 567-8900" required/><span class="form__error-msg" id="p3d-phoneErr"></span></div>
+        </div>
+        <div class="form__field"><label class="form__label" for="p3d-email">email *</label><input class="form__input" type="email" id="p3d-email" placeholder="your@email.com" required/><span class="form__error-msg" id="p3d-emailErr"></span></div>
+        <div class="form__field"><label class="form__label" for="p3d-msg">message *</label><textarea class="form__input form__textarea" id="p3d-msg" placeholder="Tell me about your project..." required rows="4"></textarea><span class="form__error-msg" id="p3d-msgErr"></span></div>
+        <button class="form__submit" type="submit" id="p3d-submitBtn"><span class="btn-text">[ send ]</span><span class="btn-loading" hidden><svg class="spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> sending...</span></button>
+        <div class="form__success" id="p3d-success" hidden></div>
+        <div class="form__error-global" id="p3d-error" hidden></div>
+      </form>
+    </div></div>` }
+};
+
+let panelOpen = false;
+
+function openPanel(key) {
+  const d = PANELS[key];
+  if (!d) return;
+  
+  document.getElementById('panel-title').textContent = d.title;
+  document.getElementById('panel-body').innerHTML = d.html;
+  document.getElementById('panel-overlay').classList.add('open');
+  panelOpen = true;
+  
+  // Exit pointer lock safely
+  if (document.pointerLockElement) {
+    document.exitPointerLock();
+  }
+  
+  if (key === 'contact') initContactForm3D();
+}
+
+function closePanel() {
+  document.getElementById('panel-overlay').classList.remove('open');
+  panelOpen = false;
+  // requestPointerLock must be called synchronously inside a user gesture handler.
+  // closePanel() is always called from one (click or keydown), so this works.
+  if (sceneStarted) {
+    const cnv = document.querySelector('canvas');
+    if (cnv) cnv.requestPointerLock();
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Escape' && panelOpen) {
+    // Do NOT close panel on Escape - browser releases pointer lock automatically,
+    // user can close with [ X ] button or clicking outside.
+  }
+});
+
+document.getElementById('panel-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('panel-overlay')) closePanel();
+});
+
+function initContactForm3D() {
+  const V = {
+    name:    v => !v.trim()?'Enter your name':v.trim().length<2?'Too short':'',
+    phone:   v => { if(!v.trim()) return 'Enter phone'; const c=v.replace(/[\s\-\(\)]/g,''); return /^\+?[\d]{7,15}$/.test(c)?'':'Invalid number'; },
+    email:   v => !v.trim()?'Enter email':/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)?'':'Invalid email',
+    comment: v => !v.trim()?'Write a message':v.trim().length<10?'Too short':'',
+  };
+  const ids = {name:'p3d-name',phone:'p3d-phone',email:'p3d-email',comment:'p3d-msg'};
+  const eids= {name:'p3d-nameErr',phone:'p3d-phoneErr',email:'p3d-emailErr',comment:'p3d-msgErr'};
+  const se = (f,m) => { const i=document.getElementById(ids[f]),e=document.getElementById(eids[f]); if(!i||!e) return; e.textContent=m; i.classList.toggle('has-error',!!m); };
+  Object.keys(ids).forEach(f => {
+    const i=document.getElementById(ids[f]); if(!i) return;
+    i.addEventListener('blur',()=>se(f,V[f](i.value)));
+    i.addEventListener('input',()=>{ if(i.classList.contains('has-error')) se(f,V[f](i.value)); });
+  });
+  const form=document.getElementById('contactForm3D'); if(!form) return;
+  form.addEventListener('submit', async e=>{
+    e.preventDefault(); let err=false; const data={};
+    Object.keys(ids).forEach(f=>{ const i=document.getElementById(ids[f]); if(!i)return; data[f]=i.value; const m=V[f](i.value); se(f,m); if(m) err=true; });
+    if(err) return;
+    const btn=document.getElementById('p3d-submitBtn');
+    btn.disabled=true; btn.querySelector('.btn-text').hidden=true; btn.querySelector('.btn-loading').hidden=false;
+    const s=document.getElementById('p3d-success'),er=document.getElementById('p3d-error');
+    er.hidden=true; s.hidden=false; s.textContent='sending...';
+    try {
+      const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      const j=await r.json(); if(!r.ok) throw new Error(j.error||'Error'); s.textContent=j.message||'Sent!';
+    } catch(ex) { s.hidden=true; er.hidden=false; er.textContent=ex.message||'Failed. Email directly.'; }
+    finally { btn.disabled=false; btn.querySelector('.btn-text').hidden=false; btn.querySelector('.btn-loading').hidden=true; }
+  });
+}
+
+// ─────────────────────────────────────────────
+// SCENE CONFIG
+// ─────────────────────────────────────────────
+
+const HALF     = 250;
+const PLAT_H   = 16;
+const PLAT_TOP = -(PLAT_H / 2);
+const EYE_H    = -300;
+
+const COL_H    = 120;
+const CAP_H    = 10;
+const CAP_W    = 68;
+const COL_CY   = PLAT_TOP - COL_H / 2;
+const CAP_CY   = PLAT_TOP - COL_H - CAP_H / 2;
+const CUBE_Y   = CAP_CY - CAP_H / 2 - 34;
+
+const PEDS = [
+  { x:   0, z:-200, key:'about',      label:'ABOUT',      col:[0,170,170] },
+  { x: 200, z:   0, key:'approach',   label:'HOW I WORK', col:[236,177,110] },
+  { x:   0, z: 200, key:'experience', label:'EXP & PROJ', col:[0,236,255] },
+  { x:-200, z:   0, key:'contact',    label:'CONTACT',    col:[130,202,177] },
+];
+
+const PARTS = Array.from({length:70}, () => ({
+  x:(Math.random()-.5)*1400, y:PLAT_TOP-Math.random()*320,
+  z:(Math.random()-.5)*1400, vy:-(0.08+Math.random()*.25), life:Math.random()
+}));
+
+// ─────────────────────────────────────────────
+// FPS CAMERA
+// ─────────────────────────────────────────────
+const cam = {
+  x: 0, 
+  z: 0,
+  yaw: 0,
+  pitch: 0.2,  // Небольшой угол вверх по умолчанию
+  speed: 3.5,
+  mouseSens: 0.0018,
+};
+
+
+const keys = {};
+let locked = false;
+let sceneStarted = false;
+
+document.addEventListener('keydown', e => { keys[e.code] = true; });
+document.addEventListener('keyup',   e => { keys[e.code] = false; });
+
+document.addEventListener('pointerlockchange', () => {
+  locked = !!document.pointerLockElement;
+  const hint = document.getElementById('lock-hint');
+  if (locked) {
+    hint.classList.add('hidden');
+  } else if (sceneStarted && !panelOpen) {
+    hint.textContent = 'CLICK TO RECAPTURE MOUSE';
+    hint.classList.remove('hidden');
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && sceneStarted && !panelOpen && !locked) {
+    const hint = document.getElementById('lock-hint');
+    hint.textContent = 'CLICK TO RECAPTURE MOUSE';
+    hint.classList.remove('hidden');
+  }
+});
+
+document.addEventListener('mousemove', e => {
+  if (!locked || panelOpen) return;
+  cam.yaw   -= e.movementX * cam.mouseSens;
+  cam.pitch += e.movementY * cam.mouseSens;  // Поменял минус на плюс
+  cam.pitch = Math.max(-1.4, Math.min(1.4, cam.pitch));
+});
+
+// Unified mousedown handler - works even after devtools / tab switch
+// because mousedown fires before pointer lock is re-checked
+document.addEventListener('mousedown', e => {
+  if (!sceneStarted || panelOpen) return;
+  // Only handle clicks on the canvas area (not UI elements)
+  if (e.target.tagName !== 'CANVAS') return;
+  if (e.button !== 0) return; // left click only
+
+  if (!locked) {
+    // Request pointer lock - this will also fire the click event
+    // but we handle cube interaction here too so it works without lock
+    const target = getTarget();
+    if (target) {
+      // Small delay so any pending pointer lock changes settle
+      setTimeout(() => openPanel(target.key), 0);
+    } else {
+      document.querySelector('canvas').requestPointerLock();
+    }
+    return;
+  }
+
+  // Already locked - check for cube interaction
+  const target = getTarget();
+  if (target) {
+    openPanel(target.key);
+  }
+});
+
+document.getElementById('splash-btn').addEventListener('click', () => {
+  const s = document.getElementById('splash');
+  s.style.opacity = '0';
+  setTimeout(() => s.style.display = 'none', 400);
+  sceneStarted = true;
+  const cnv = document.querySelector('canvas');
+  if (cnv) cnv.requestPointerLock();
+});
+
+function updateCam() {
+  if (!sceneStarted || panelOpen) return;
+  
+  const sp = cam.speed;
+  const s = Math.sin(cam.yaw);
+  const c = Math.cos(cam.yaw);
+  
+  if (keys['KeyW'] || keys['ArrowUp'])    { cam.x -= s*sp; cam.z -= c*sp; }
+  if (keys['KeyS'] || keys['ArrowDown'])  { cam.x += s*sp; cam.z += c*sp; }
+  if (keys['KeyA'] || keys['ArrowLeft'])  { cam.x -= c*sp; cam.z += s*sp; }
+  if (keys['KeyD'] || keys['ArrowRight']) { cam.x += c*sp; cam.z -= s*sp; }
+  
+  cam.x = Math.max(-HALF + 30, Math.min(HALF - 30, cam.x));
+  cam.z = Math.max(-HALF + 30, Math.min(HALF - 30, cam.z));
+}
+
+// Ray-cube intersection using slab method
+function rayBoxIntersection(rayOrigin, rayDir, boxCenter, boxSize) {
+  const boxMin = {
+    x: boxCenter.x - boxSize/2,
+    y: boxCenter.y - boxSize/2,
+    z: boxCenter.z - boxSize/2
+  };
+  const boxMax = {
+    x: boxCenter.x + boxSize/2,
+    y: boxCenter.y + boxSize/2,
+    z: boxCenter.z + boxSize/2
+  };
+  
+  let tmin = (boxMin.x - rayOrigin.x) / rayDir.x;
+  let tmax = (boxMax.x - rayOrigin.x) / rayDir.x;
+  if (tmin > tmax) [tmin, tmax] = [tmax, tmin];
+  
+  let tymin = (boxMin.y - rayOrigin.y) / rayDir.y;
+  let tymax = (boxMax.y - rayOrigin.y) / rayDir.y;
+  if (tymin > tymax) [tymin, tymax] = [tymax, tymin];
+  
+  if ((tmin > tymax) || (tymin > tmax)) return null;
+  if (tymin > tmin) tmin = tymin;
+  if (tymax < tmax) tmax = tymax;
+  
+  let tzmin = (boxMin.z - rayOrigin.z) / rayDir.z;
+  let tzmax = (boxMax.z - rayOrigin.z) / rayDir.z;
+  if (tzmin > tzmax) [tzmin, tzmax] = [tzmax, tzmin];
+  
+  if ((tmin > tzmax) || (tzmin > tmax)) return null;
+  if (tzmin > tmin) tmin = tzmin;
+  if (tzmax < tmax) tmax = tzmax;
+  
+  return tmin > 0 ? tmin : (tmax > 0 ? tmax : null);
+}
+
+function getTarget() {
+  const eyeY = PLAT_TOP + EYE_H;
+  
+  const dirX = -Math.sin(cam.yaw) * Math.cos(cam.pitch);
+  const dirY = Math.sin(cam.pitch);
+  const dirZ = -Math.cos(cam.yaw) * Math.cos(cam.pitch);
+  
+  let best = null;
+  let bestDist = 600;  // Max distance
+  
+  for (const ped of PEDS) {
+    const dist = rayBoxIntersection(
+      { x: cam.x, y: eyeY, z: cam.z },
+      { x: dirX, y: dirY, z: dirZ },
+      { x: ped.x, y: CUBE_Y, z: ped.z },
+      48  // Cube size
+    );
+    
+    if (dist !== null && dist < bestDist) {
+      bestDist = dist;
+      best = ped;
+    }
+  }
+  
+  return best;
+}
+
+// ─────────────────────────────────────────────
+// p5.js SKETCH
+// ─────────────────────────────────────────────
+const cubeAng = [0, 0, 0, 0];
+const interactHint = document.getElementById('interact-hint');
+
+new p5(p => {
+  p.setup = () => {
+    const cnv = p.createCanvas(innerWidth, innerHeight, p.WEBGL);
+    
+    p.smooth();
+  };
+
+  p.windowResized = () => p.resizeCanvas(innerWidth, innerHeight);
+
+  p.draw = () => {
+    updateCam();
+    p.background(0, 14, 20);
+
+    const eyeX = cam.x;
+    const eyeY = PLAT_TOP + EYE_H;
+    const eyeZ = cam.z;
+    
+    const dirX = -Math.sin(cam.yaw) * Math.cos(cam.pitch);
+    const dirY = Math.sin(cam.pitch);
+    const dirZ = -Math.cos(cam.yaw) * Math.cos(cam.pitch);
+    
+    const centerX = eyeX + dirX * 100;
+    const centerY = eyeY + dirY * 100;
+    const centerZ = eyeZ + dirZ * 100;
+    
+    p.camera(
+      eyeX, eyeY, eyeZ,
+      centerX, centerY, centerZ,
+      0, 1, 0
+    );
+
+    p.ambientLight(28, 42, 52);
+    p.directionalLight(0, 170, 170, 0.35, -1, -0.4);
+    p.directionalLight(236, 177, 110, -0.5, -0.4, 0.9);
+    p.pointLight(0, 200, 200, 0, -200, 0);
+
+    drawGrid(p);
+    drawPlatform(p);
+    
+    for (let i = 0; i < PEDS.length; i++) {
+      cubeAng[i] += 0.013;
+      drawPedestal(p, PEDS[i], cubeAng[i]);
+    }
+    
+    drawParticles(p);
+
+    if (!panelOpen) {
+      const target = getTarget();
+      if (target) {
+        interactHint.textContent = `[ click · ${target.label} ]`;
+        interactHint.classList.add('visible');
+      } else {
+        interactHint.classList.remove('visible');
+      }
+    } else {
+      interactHint.classList.remove('visible');
+    }
+  };
+});
+
+function drawGrid(p) {
+  p.push();
+  p.stroke(0, 72, 92, 50);
+  p.strokeWeight(1);
+  p.noFill();
+  
+  const S = 3200;
+  const step = 80;
+  const h = S / 2;
+  
+  for (let x = -h; x <= h; x += step) {
+    p.line(x, 0, -h, x, 0, h);
+  }
+  for (let z = -h; z <= h; z += step) {
+    p.line(-h, 0, z, h, 0, z);
+  }
+  
+  p.pop();
+}
+
+function drawPlatform(p) {
+  p.push();
+  
+  p.fill(11, 12, 50);
+  p.stroke(0, 82, 100);
+  p.strokeWeight(1);
+  p.box(HALF * 2, PLAT_H, HALF * 2);
+  
+  p.noFill();
+  p.stroke(0, 170, 170, 65);
+  p.strokeWeight(1.5);
+  const t = PLAT_TOP;
+  const s = HALF;
+  p.beginShape();
+  p.vertex(-s, t, -s);
+  p.vertex(s, t, -s);
+  p.vertex(s, t, s);
+  p.vertex(-s, t, s);
+  p.vertex(-s, t, -s);
+  p.endShape();
+  
+  p.stroke(0, 170, 170, 22);
+  p.strokeWeight(1);
+  const s2 = s - 18;
+  p.beginShape();
+  p.vertex(-s2, t, -s2);
+  p.vertex(s2, t, -s2);
+  p.vertex(s2, t, s2);
+  p.vertex(-s2, t, s2);
+  p.vertex(-s2, t, -s2);
+  p.endShape();
+  
+  p.pop();
+}
+
+function drawPedestal(p, ped, angle) {
+  const { x, z, col } = ped;
+  
+  p.push();
+  p.translate(x, 0, z);
+
+  p.push();
+  p.translate(0, COL_CY, 0);
+  p.fill(13, 26, 32);
+  p.stroke(0, 82, 100);
+  p.strokeWeight(1);
+  p.box(50, COL_H, 50);
+  p.pop();
+
+  p.noFill();
+  p.stroke(col[0], col[1], col[2], 85);
+  p.strokeWeight(1.2);
+  for (let yy = -40; yy <= 40; yy += 24) {
+    p.push();
+    p.translate(0, COL_CY + yy, 0);
+    p.box(52, 1, 52);
+    p.pop();
+  }
+
+  p.push();
+  p.translate(0, CAP_CY, 0);
+  p.fill(10, 18, 25);
+  p.stroke(0, 82, 100);
+  p.strokeWeight(1);
+  p.box(CAP_W, CAP_H, CAP_W);
+  p.pop();
+
+  p.push();
+  p.translate(0, CUBE_Y, 0);
+  p.rotateY(angle);
+  p.rotateX(angle * 0.55);
+  
+  p.noFill();
+  p.stroke(col[0], col[1], col[2], 40);
+  p.strokeWeight(1);
+  p.box(62);
+  
+  p.fill(col[0] * 0.1, col[1] * 0.1, col[2] * 0.1);
+  p.stroke(col[0], col[1], col[2], 230);
+  p.strokeWeight(1.4);
+  p.box(48);
+  
+  p.fill(col[0], col[1], col[2], 20);
+  p.noStroke();
+  p.box(38);
+  
+  p.pop();
+
+  p.push();
+  p.translate(0, CUBE_Y - 40, 0);
+  p.rotateY(-cam.yaw);
+  p.fill(col[0], col[1], col[2], 200);
+  p.noStroke();
+  p.textFont('monospace');
+  p.textSize(10);
+  p.textAlign(p.CENTER, p.CENTER);
+  p.text(ped.label, 0, 0);
+  p.pop();
+
+  p.pop();
+}
+
+function drawParticles(p) {
+  for (const pt of PARTS) {
+    pt.y += pt.vy;
+    pt.life -= 0.0018;
+    
+    if (pt.life <= 0) {
+      pt.x = (Math.random() - 0.5) * 1400;
+      pt.y = PLAT_TOP - 5;
+      pt.z = (Math.random() - 0.5) * 1400;
+      pt.life = 0.4 + Math.random() * 0.6;
+    }
+    
+    p.push();
+    p.translate(pt.x, pt.y, pt.z);
+    p.stroke(0, 170, 170, pt.life * 170);
+    p.strokeWeight(1.8);
+    p.point(0, 0, 0);
+    p.pop();
+  }
+}
+</script>
+</body>
+</html>
