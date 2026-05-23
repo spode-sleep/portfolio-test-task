@@ -2,6 +2,100 @@
   "use strict";
 
   // ──────────────────────────────────────────────
+  // Page Loader
+  // ──────────────────────────────────────────────
+  (function initLoader() {
+    const loader   = document.getElementById("page-loader");
+    const bar      = document.getElementById("loaderBar");
+    const status   = document.getElementById("loaderStatus");
+
+    if (!loader) return;
+
+    // Prevent scroll during load
+    document.body.classList.add("loading");
+
+    let progress = 0;
+
+    function setProgress(p, label) {
+      progress = Math.min(100, Math.max(progress, p));
+      if (bar)    bar.style.width = progress + "%";
+      if (status) status.textContent = label || "loading...";
+    }
+
+    function finish() {
+      setProgress(100, "ready");
+      setTimeout(function () {
+        loader.classList.add("is-hidden");
+        document.body.classList.remove("loading");
+        // Remove from DOM after transition
+        loader.addEventListener("transitionend", function () {
+          loader.remove();
+        }, { once: true });
+      }, 200);
+    }
+
+    // ── Track font loading ──
+    var fontReady = false;
+    var imagesReady = false;
+
+    function checkDone() {
+      if (fontReady && imagesReady) finish();
+    }
+
+    // Fonts via document.fonts API
+    if (document.fonts && document.fonts.ready) {
+      setProgress(10, "loading fonts...");
+      document.fonts.ready.then(function () {
+        fontReady = true;
+        setProgress(50, "fonts loaded");
+        checkDone();
+      });
+    } else {
+      // Fallback: assume fonts done quickly
+      fontReady = true;
+      setProgress(50, "fonts loaded");
+    }
+
+    // ── Track image loading ──
+    var images = Array.from(document.images);
+
+    if (images.length === 0) {
+      imagesReady = true;
+      setProgress(90, "images loaded");
+      checkDone();
+    } else {
+      var loaded = 0;
+
+      function onImageLoad() {
+        loaded++;
+        var imgProgress = 50 + Math.round((loaded / images.length) * 45);
+        setProgress(imgProgress, "loading images (" + loaded + "/" + images.length + ")...");
+        if (loaded >= images.length) {
+          imagesReady = true;
+          setProgress(95, "images loaded");
+          checkDone();
+        }
+      }
+
+      images.forEach(function (img) {
+        if (img.complete && img.naturalWidth > 0) {
+          onImageLoad();
+        } else {
+          img.addEventListener("load",  onImageLoad, { once: true });
+          img.addEventListener("error", onImageLoad, { once: true }); // don't block on broken img
+        }
+      });
+    }
+
+    // ── Safety timeout — never block indefinitely ──
+    setTimeout(function () {
+      if (!loader.classList.contains("is-hidden")) {
+        finish();
+      }
+    }, 5000);
+  })();
+
+  // ──────────────────────────────────────────────
   // Form validation
   // ──────────────────────────────────────────────
   const validators = {
